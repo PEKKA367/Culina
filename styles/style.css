@@ -1,0 +1,159 @@
+/* VARIABLES */
+:root {
+    --color-primary: #27ae60;
+    --color-primary-hover: #219150;
+
+    --color-dark: #2c3e50;
+    --color-text: #2c3e50;
+    --color-text-light: #7f8c8d;
+    --color-bg: #ecf0f1;
+
+    --color-danger: #e74c3c;
+    --color-white: #ffffff;
+
+    --container-width: 1200px;
+    --header-height: 80px;
+    --border-radius: 8px;
+}
+
+
+/* BASE & RESET */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+
+/* LAYOUT UTILITIES (SKELETON) */
+.wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main {
+    flex-grow: 1;
+    padding: 40px 0;
+}
+
+.container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+/* COMPONENTS (OCSS) */
+/* (Structure) */
+.btn {
+    display: inline-block;
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+/* (Skin) */
+.btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-hover);
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+}
+
+.btn-danger {
+    background-color: transparent;
+    color: var(--color-danger);
+    padding: 5px 10px;
+    border-radius: var(--border-radius);
+}
+
+.btn-danger:hover {
+    background-color: rgba(231, 76, 60, 0.1);
+}
+
+.btn-outline {
+    background-color: transparent;
+    border: 2px solid var(--color-primary);
+    color: var(--color-primary);
+}
+
+.header {
+    background-color: var(--color-dark);
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-img {
+    height: 50px;
+    width: auto;
+}
+
+.nav-list {
+    display: flex;
+    gap: 40px;
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+    transition: color 0.2s;
+}
+
+.nav-link:hover {
+    color: var(--color-white);
+}
+
+.footer {
+    background-color: var(--color-dark);
+    padding: 20px 0;
+    margin-top: auto;
+}
+
+.footer-text {
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+    margin: 0;
+}
+
+
+/* UTILITIES */

@@ -1,0 +1,86 @@
+<!DOCTYPE html><html lang="uk"><head><script type="module" src="/form.c60ba725.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Culina - Додати рецепт</title>
+
+    <link rel="stylesheet" href="/cook-book.2687eea0.css">
+    <link rel="stylesheet" href="/form.370f56a4.css">
+</head>
+
+<body>
+    <div class="wrapper">
+
+        <header class="header">
+            <div class="container header-content">
+                <a href="/index.html" class="logo">
+                    <img class="logo-img" src="/Culina.086b57d6.png" alt="Culina Logo">
+                </a>
+
+                <nav class="nav">
+                    <ul class="nav-list">
+                        <li><a href="#" class="nav-link">Пошук</a></li>
+                        <li><a href="#" class="nav-link">Категорії</a></li>
+                    </ul>
+                </nav>
+
+                <div class="header-actions">
+                    <a href="/pages/form.html" class="btn btn-primary">Очистити</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="container container-sm">
+
+                <form id="form-recipe" class="form">
+                    <div class="form-group">
+                        <label for="title-input">Назва рецепту</label>
+                        <input class="form-input" type="text" id="title-input" name="title" placeholder="Назва рецепту..." required="">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description-input">Короткий опис</label>
+                        <textarea class="form-input" id="description-input" name="description" placeholder="Опис до страви..." rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Інгредієнти</label>
+                        <div id="ingredients-list" class="ingredients-list">
+                            <div class="ingredient-row">
+                                <input class="form-input ingredient-name" type="text" name="ingredient-name" placeholder="Інгредієнт">
+                                <input class="form-input ingredient-amount" type="text" name="ingredient-amount" placeholder="Кількість">
+                            </div>
+                        </div>
+
+                        <button type="button" id="btn-add" class="btn btn-dashed">Додати інгредієнт +</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="process-input">Процес приготування</label>
+                        <textarea class="form-input" id="process-input" name="steps" placeholder="Процес приготування..." rows="10" required=""></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Зберегти рецепт</button>
+                </form>
+
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p class="footer-text">© 2026 Culina | Проєкт Іллі Бугая</p>
+            </div>
+        </footer>
+    </div>
+
+    <template id="ingredient-template">
+        <div class="ingredient-row">
+            <input class="form-input ingredient-name" type="text" name="ingredient-name" placeholder="Інгредієнт">
+            <input class="form-input ingredient-amount" type="text" name="ingredient-amount" placeholder="Кількість">
+        </div>
+    </template>
+
+    <script type="module" src="/form.7ef95d3a.js"></script>
+
+
+</body></html>

@@ -1,0 +1,76 @@
+.container-sm {
+  max-width: 800px;
+}
+
+.form {
+  background-color: var(--color-white);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 4px 15px #0000000d;
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+.form-group label {
+  display: none;
+}
+
+.form-input {
+  border: 2px solid var(--color-dark);
+  width: 100%;
+  color: var(--color-text);
+  resize: none;
+  background-color: #0000;
+  border-radius: 20px;
+  outline: none;
+  padding: 12px 15px;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  transition: border-color .2s;
+}
+
+.form-input:focus {
+  border-color: var(--color-primary);
+}
+
+.form-input::placeholder {
+  color: var(--color-text-light);
+}
+
+.ingredient-list {
+  flex-direction: column;
+  gap: 15px;
+  display: flex;
+}
+
+.ingredient-row {
+  gap: 30px;
+  margin-bottom: 20px;
+  display: flex;
+}
+
+.ingredient-name {
+  flex: 7;
+}
+
+.ingredient-amount {
+  flex: 1;
+}
+
+.btn-dashed {
+  color: #e67e22;
+  background-color: #0000;
+  border: 2px dashed #e67e22;
+}
+
+.btn-dashed:hover {
+  background-color: #e67e221a;
+}
+
+.w-100 {
+  width: 100%;
+}
+/*# sourceMappingURL=form.370f56a4.css.map */

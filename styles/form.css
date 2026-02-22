@@ -1,0 +1,93 @@
+/* VARIABLES */
+
+
+/* BASE & RESET */
+
+
+/* LAYOUT UTILITIES (SKELETON) */
+.container-sm {
+    max-width: 800px;
+}
+
+
+/* COMPONENTS (OCSS) */
+.form {
+    padding: 30px;
+    background-color: var(--color-white);
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: none;
+}
+
+/* (Structure) */
+.form-input {
+    width: 100%;
+    padding: 12px 15px;
+
+    border: 2px solid var(--color-dark); 
+    border-radius: 20px;
+    font-size: 16px;
+    color: var(--color-text);
+    outline: none;
+    
+    background-color: transparent; 
+
+    resize: none;
+    transition: border-color 0.2s;
+
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* (Skin) */
+.form-input:focus {
+    border-color: var(--color-primary);
+}
+
+.form-input::placeholder {
+    color: var(--color-text-light);
+}
+
+.ingredient-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.ingredient-row {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 20px;
+}
+
+.ingredient-name {
+    flex: 7;
+}
+
+.ingredient-amount {
+    flex: 1;
+}
+
+.btn-dashed {
+    background-color: transparent;
+    color: #e67e22;
+    border: 2px dashed #e67e22;
+}
+
+.btn-dashed:hover {
+    background-color: rgba(230, 126, 34, 0.1);
+}
+
+
+/* UTILITIES */
+.w-100 {
+    width: 100%;
+}

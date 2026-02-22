@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Culina - Головна</title>
+
+    <link rel="stylesheet" href="/styles/style.css">
+    <link rel="stylesheet" href="/styles/home.css">
+</head>
+
+<body>
+    <div class="wrapper">
+
+        <header class="header">
+            <div class="container header-content">
+                <a href="index.html" class="logo">
+                    <img class="logo-img" src="images/Culina.png" alt="Culina Logo">
+                </a>
+
+                <nav class="nav">
+                    <ul class="nav-list">
+                        <li><a href="#" class="nav-link">Пошук</a></li>
+                        <li><a href="#" class="nav-link">Категорії</a></li>
+                    </ul>
+                </nav>
+
+                <div class="header-actions">
+                    <a href="/pages/form.html" class="btn btn-primary">Додати рецепт</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="container">
+                <div id="recipes" class="recipes-grid">
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p class="footer-text">&copy; 2026 Culina | Проєкт Іллі Бугая</p>
+            </div>
+        </footer>
+    </div>
+
+    <template id="recipe-template">
+        <article class="card">
+            <div class="card-body">
+                <h3 class="card-title recipe-title"></h3>
+                <p class="card-desc recipe-description"></p>
+                <div class="card-meta">
+                    <span class="ingredients-count"></span>
+                </div>
+            </div>
+
+            <div class="card-actions">
+                <a href="./pages/recipe.html" style="display:none;" class="btn-open-hidden"></a>
+
+                <a href="#" class="btn btn-primary btn-open">Відкрити</a>
+                <button class="btn btn-danger btn-delete">Видалити</button>
+            </div>
+        </article>
+    </template>
+
+    <script type="module" src="./scripts/load-recipes.js"></script>
+</body>
+
+</html>

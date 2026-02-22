@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Culina</title>
+    <link rel="stylesheet" href="../styles/style.css">
+    <link rel="stylesheet" href="../styles/recipe.css">
+</head>
+
+<body>
+    <div class="wrapper">
+        <header class="header">
+            <div class="header-container">
+                <a href="../index.html" class="logo">
+                    <img class="logo-img" src="../images/Culina.png">
+                </a>
+                <nav class="navigation">
+                    <div class="navigation-links">
+                        <a class="link">Пошук</a>
+                        <a class="link">Категорії</a>
+                    </div>
+                </nav>
+                <div class="add-recipe-container">
+                    <button href="/pages/form.html" class="recipe-link add-link">Редагувати</button>
+                    <button href="/pages/form.html" class="recipe-link save-link">Зберегти</button>
+                    <button href="/pages/form.html" class="recipe-link cancel-link">Скасувати</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="main-container">
+                <div class="recipe-container">
+                    <a class="btn-back" href="../index.html">&larr; До рецептів</a>
+                    <div class="recipe-title"></div>
+                    <div class="recipe-description"></div>
+                    <div class="ingredients-and-process-container">
+                        <ul class="ingredients-list">
+                        </ul>
+                        <div class="process"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-container">
+                <p>&copy; Бугай Ілля. Проєкт з ОП | Culina</p>
+            </div>
+        </footer>
+    </div>
+
+    <template id="ingredient-and-amount-template">
+        <li class="ingredient-and-amount">
+            <div class="ingredient"></div>
+            <div class="amount"></div>
+        </li>
+    </template>
+
+    <script type="module" src="../scripts/view-recipe.js"></script>
+</body>
+
+</html>
