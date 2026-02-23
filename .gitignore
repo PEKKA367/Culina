@@ -77,3 +77,10 @@ node_modules/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Parcel bundler files
+.parcel-cache/
+dist/
+
+# My own cheat sheets
+cheat-sheet.md
