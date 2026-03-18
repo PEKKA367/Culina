@@ -11,6 +11,11 @@
     --color-danger: #e74c3c;
     --color-white: #ffffff;
 
+    /* Змінні для "шкіри" DOOM */
+    --color-doom-bg: #121212;
+    --color-doom-border: #8b0000;
+    --color-doom-text: #e0e0e0;
+
     --container-width: 1200px;
     --header-height: 80px;
     --border-radius: 8px;
@@ -110,14 +115,16 @@ ul {
     color: var(--color-primary);
 }
 
+/* Оновлено для коректної роботи з банером всередині */
 .header {
     background-color: var(--color-dark);
-    height: var(--header-height);
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    width: 100%;
 }
 
 .header-content {
+    height: var(--header-height); /* Висота переїхала сюди */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -157,3 +164,54 @@ ul {
 
 
 /* UTILITIES */
+
+/* --- ДИНАМІЧНИЙ БАНЕР (ЛАБА) --- */
+
+/* 1. Structure (Структура) */
+.carousel-banner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 6px 20px;
+    width: 100%;
+    min-height: 32px;
+}
+
+.carousel-text {
+    font-size: 0.9rem; /* Трошки збільшив, щоб на зеленому фоні краще читалося */
+    font-weight: 500;
+}
+
+.highlight-word {
+    font-weight: 700; /* Просто жирний текст, жодних підкреслень чи інших кольорів */
+}
+
+.btn-small {
+    padding: 4px 12px;
+    font-size: 0.8rem;
+}
+
+.carousel-btn:disabled {
+    opacity: 0.6; /* Трохи збільшив непрозорість для білого на зеленому */
+    cursor: not-allowed;
+    transform: translateY(0);
+}
+
+/* 2. Skin (Шкіра - Фірмовий стиль) */
+.theme-brand {
+    background-color: var(--color-primary); /* Твій фірмовий зелений */
+    color: var(--color-white); /* Білий текст */
+    border: none; /* Жодних ліній підкреслення */
+}
+
+/* Стилізуємо кнопку під нову шкіру */
+.theme-brand .btn-outline {
+    border-color: var(--color-white);
+    color: var(--color-white);
+}
+
+.theme-brand .btn-outline:hover {
+    background-color: var(--color-white);
+    color: var(--color-primary); /* Текст стає зеленим при наведенні */
+}
