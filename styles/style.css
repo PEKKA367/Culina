@@ -11,11 +11,6 @@
     --color-danger: #e74c3c;
     --color-white: #ffffff;
 
-    /* Змінні для "шкіри" DOOM */
-    --color-doom-bg: #121212;
-    --color-doom-border: #8b0000;
-    --color-doom-text: #e0e0e0;
-
     --container-width: 1200px;
     --header-height: 80px;
     --border-radius: 8px;
@@ -69,7 +64,7 @@ ul {
 }
 
 
-/* COMPONENTS (OCSS) */
+/* COMPONENTS (OOCSS) */
 /* (Structure) */
 .btn {
     display: inline-block;
@@ -115,7 +110,6 @@ ul {
     color: var(--color-primary);
 }
 
-/* Оновлено для коректної роботи з банером всередині */
 .header {
     background-color: var(--color-dark);
     display: flex;
@@ -124,7 +118,7 @@ ul {
 }
 
 .header-content {
-    height: var(--header-height); /* Висота переїхала сюди */
+    height: var(--header-height);
     display: flex;
     justify-content: space-between;
     align-items: center;

@@ -1,51 +1,33 @@
-.main-container {
-    max-width: 1000px;
-}
+/* BASE & RESET */
 
+/* LAYOUT UTILITIES (SKELETON) */
+
+/* COMPONENTS (OOCSS) */
 .recipe-container {
     padding: 30px;
-
     background-color: rgb(255, 255, 255);
     border-radius: 20px;
 }
 
 .btn-back {
-    max-width: 100px;
-    margin-bottom: 30px;
+    max-width: max-content;
     padding: 8px 16px;
-
+    margin-bottom: 30px;
     display: block;
-
     cursor: pointer;
-    text-decoration: none;
-    background-color: transparent;
-    color: rgb(44, 62, 80);
-    border: 2px solid rgb(44, 62, 80);
+    color: var(--color-text);
+    border: 2px solid var(--color-dark);
     border-radius: 12px;
 }
 
 .recipe-title {
+    min-width: 300px;
     max-width: max-content;
-    box-sizing: border-box;
-    padding: 12px 15px;
-    margin-bottom: 30px;
-
-    border: 2px solid rgb(44, 62, 80);
-    border-radius: 20px;
-    font-size: 16px;
-    color: rgb(44, 62, 80);
 }
 
 .recipe-description {
+    min-width: 500px;
     max-width: max-content;
-    box-sizing: border-box;
-    padding: 12px 15px;
-    margin-bottom: 30px;
-
-    border: 2px solid rgb(44, 62, 80);
-    border-radius: 20px;
-    font-size: 16px;
-    color: rgb(44, 62, 80);
 }
 
 .ingredients-and-process-container {
@@ -67,38 +49,33 @@
 }
 
 .ingredient {
-    box-sizing: border-box;
-    padding: 12px 15px;
-    margin-bottom: 30px;
-
-    border: 2px solid rgb(44, 62, 80);
-    border-radius: 20px;
-    font-size: 16px;
-    color: rgb(44, 62, 80);
     flex: 5;
 }
 
 .amount {
-    box-sizing: border-box;
-    padding: 12px 15px;
-    margin-bottom: 30px;
-
-    border: 2px solid rgb(44, 62, 80);
-    border-radius: 20px;
-    font-size: 16px;
-    color: rgb(44, 62, 80);
     flex: 1;
 }
 
 .process {
-    max-width: max-content;
-    box-sizing: border-box;
-    padding: 12px 15px;
-    margin-bottom: 30px;
+    flex: 6;
+}
 
-    border: 2px solid rgb(44, 62, 80);
+/* (Structure) */
+.field-indents {
+    margin-bottom: 30px;
+    padding: 12px 15px;
+}
+
+/* (Skin) */
+.recipe-skin {
+    border: 2px solid var(--color-dark);
+    color: var(--color-text);
     border-radius: 20px;
     font-size: 16px;
-    color: rgb(44, 62, 80);
-    flex: 6;
+}
+
+/* UTILITIES */
+.w-max {
+    max-width: max-content;
+    box-sizing: border-box;
 }
