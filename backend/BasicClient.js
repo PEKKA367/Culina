@@ -3,3 +3,5 @@ class BasicClient {
         return await fetch(url, config);
     }
 }
+
+module.exports = BasicClient;
