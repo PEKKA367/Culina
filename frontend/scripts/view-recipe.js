@@ -1,6 +1,6 @@
 //IMPORTS
-import { db } from './firebase-config.js';
-import { doc, getDoc } from "firebase/firestore";
+import {db} from './firebase-config.js';
+import {doc, getDoc} from "firebase/firestore";
 
 
 //CONSTANTS
@@ -23,7 +23,7 @@ const template = document.getElementById('ingredient-and-amount-template');
 //HELPER FUNCTIONS (USED IN MAIN FUNCTIONS)
 function renderIngredients(ingredientsArray) {
     if (!ingredientsArray) return;
-    
+
     ingredientsList.innerHTML = '';
 
     ingredientsArray.forEach(item => {
