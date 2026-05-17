@@ -10,6 +10,11 @@ const recipeProcess = document.querySelector(".process");
 
 const btnEdit = document.querySelector(".btn-primary");
 //HELPER FUNCTIONS (USED IN MAIN FUNCTIONS)
+function cleanStyle(event) {
+    event.preventDefault();
+    const insertedText = event.clipboardData.getData('text/plain');
+    document.execCommand("insertText", false, insertedText);
+}
 
 //MAIN FUNCTIONS
 async function editRecipe() {
@@ -79,3 +84,5 @@ async function editRecipe() {
 
 //PROGRAM EXECUTION
 btnEdit.addEventListener("click", editRecipe);
+recipeTitle.addEventListener("paste", cleanStyle);
+recipeDescription.addEventListener("paste", cleanStyle);

@@ -11,6 +11,12 @@
   "license": "ISC",
   "dependencies": {
     "@fastify/cors": "^11.2.0",
+    "@fastify/jwt": "^10.0.0",
+    "@prisma/client": "^6.19.3",
+    "bcryptjs": "^3.0.3",
     "fastify": "^5.8.5"
+  },
+  "devDependencies": {
+    "prisma": "^6.19.3"
   }
 }

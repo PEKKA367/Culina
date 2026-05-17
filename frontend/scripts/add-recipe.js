@@ -61,7 +61,7 @@ async function handleFormSubmit(event) {
     try {
         await addDoc(collection(db, "recipes"), newRecipe);
         alert("Рецепт успішно збережено!");
-        window.location.href = "../index.html"; 
+        window.location.href = "../index.html";
     } catch (error) {
         console.error("Помилка збереження:", error);
         alert("Сталася помилка при збереженні");
