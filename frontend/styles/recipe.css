@@ -89,6 +89,37 @@
     white-space: nowrap;
 }
 
+.steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.step-block {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.step-block {
+    border: 2px solid var(--color-bg);
+    border-radius: 16px;
+}
+
+.step-number {
+    color: var(--color-primary);
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.step-text {
+    margin: 0;
+    line-height: 1.6;
+}
+
 .process {
     flex: 6;
 }
