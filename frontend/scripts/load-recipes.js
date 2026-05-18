@@ -80,9 +80,7 @@ function createRecipeCard(firebaseDoc) {
 }
 
 
-// ==========================================
-// 4. MAIN FUNCTIONS
-// ==========================================
+//MAIN FUNCTIONS
 async function loadRecipes() {
     try {
         // Очищаємо контейнер

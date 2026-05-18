@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 
 <head>
     <meta charset="utf-8">
@@ -15,7 +15,7 @@
     <header class="header">
         <div class="container header-content">
             <a href="../index.html" class="logo">
-                <img class="logo-img" src="../images/Culina.png">
+                <img class="logo-img" alt="Culina logo" src="../images/Culina.png">
             </a>
 
             <nav class="nav">
@@ -38,8 +38,11 @@
                 <div class="recipe-title"></div>
                 <div class="recipe-description"></div>
                 <div class="ingredients-and-process-container">
-                    <ul class="ingredients-list">
-                    </ul>
+                    <div class="ingredients-block">
+                        <h2 class="ingredients-title">Інгредієнти</h2>
+                        <ul class="ingredients-list">
+                        </ul>
+                    </div>
                     <div class="recipe-skin field-indents process"></div>
                 </div>
             </div>
@@ -54,9 +57,9 @@
 </div>
 
 <template id="ingredient-and-amount-template">
-    <li class="ingredient-and-amount">
-        <div class="recipe-skin field-indents ingredient"></div>
-        <div class="recipe-skin field-indents amount"></div>
+    <li class="ingredient-and-amount-divider ingredient-and-amount">
+        <span class="ingredient"></span>
+        <span class="amount"></span>
     </li>
 </template>
 

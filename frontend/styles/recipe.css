@@ -41,27 +41,52 @@
 .ingredients-and-process-container {
     display: flex;
     gap: 50px;
-}a
+}
 
-.ingredients-list {
+.ingredients-block {
     flex: 4;
     display: flex;
     flex-direction: column;
-    gap: 15px;
 }
+
+/* (Structure) */
+.ingredients-list {
+    display: flex;
+    flex-direction: column;
+}
+
+/* (Structure) */
+.ingredients-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0 0 12px 0;
+    padding-bottom: 10px;
+}
+
+/* (Skin) */
 
 .ingredient-and-amount {
     display: flex;
     justify-content: space-between;
     gap: 30px;
+    padding: 14px 0;
+}
+
+/* (Skin) */
+.ingredient-and-amount-divider {
+    border-bottom: 1px solid var(--color-bg);
 }
 
 .ingredient {
-    flex: 5;
+    flex: 1;
+    font-weight: 600;
 }
 
 .amount {
     flex: 1;
+    color: var(--color-text-light);
+    text-align: right;
+    white-space: nowrap;
 }
 
 .process {

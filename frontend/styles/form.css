@@ -56,6 +56,42 @@
     color: var(--color-text-light);
 }
 
+/* (Structure) */
+.steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+/* (Structure) */
+.step-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+/* (Skin) */
+.step-number {
+    min-width: 28px;
+    height: 28px;
+    margin-top: 12px;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+/* (Structure) */
+.step-input {
+    flex: 1;
+}
+
 .ingredient-list {
     display: flex;
     flex-direction: column;

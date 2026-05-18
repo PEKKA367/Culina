@@ -63,9 +63,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="process-input">Процес приготування</label>
-                        <textarea class="form-input" id="process-input" name="steps"
-                            placeholder="Процес приготування..." rows="10" required></textarea>
+                        <label>Процес приготування</label>
+                        <div id="steps-list" class="steps-list">
+                        </div>
+                        <button type="button" id="btn-add-step" class="btn btn-dashed">Додати крок +</button>
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100">Зберегти рецепт</button>
@@ -85,6 +86,14 @@
         <div class="ingredient-row">
             <input class="form-input ingredient-name" type="text" name="ingredient-name" placeholder="Інгредієнт">
             <input class="form-input ingredient-amount" type="text" name="ingredient-amount" placeholder="Кількість">
+        </div>
+    </template>
+
+    <template id="step-template">
+        <div class="step-row">
+            <span class="step-number"></span>
+            <textarea class="form-input step-input" name="step" placeholder="Опис кроку..." rows="2"></textarea>
+            <button type="button" class="btn btn-danger step-delete">⨉</button>
         </div>
     </template>
 
