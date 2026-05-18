@@ -1,7 +1,7 @@
 //IMPORTS
 import { db } from './firebase-config.js';
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
-import { recipeGenerator, spinTheCarousel } from "../../core-utils/iterator.js";
+import { recipeGenerator, spinTheCarousel } from "culina-utils";
 
 
 //CONSTANTS & DOM ELEMENTS
@@ -89,7 +89,7 @@ async function handleSurpriseMe() {
 
     const snapshot = await getDocs(collection(db, "recipes"));
     const recipes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // adds id (not stored inside Firebase doc by default) to each recipe object
-    recipes.sort(() => Math.random() - 0.5); // ДОДАНО: перемішуємо для рандому
+    recipes.sort(() => Math.random() - 0.5);
     const gen = recipeGenerator(recipes);
     const recipe = await spinTheCarousel(gen, 3);
     window.location.href = `pages/recipe.html?id=${recipe.id}`;
