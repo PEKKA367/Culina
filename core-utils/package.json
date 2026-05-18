@@ -1,13 +1,19 @@
 {
   "name": "culina-utils",
   "version": "1.0.0",
-  "description": "Utility library for Culina app",
+  "description": "Reusable utilities for the Culina recipe app: generators, iterators, and async helpers.",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "culina",
+    "recipes",
+    "generator",
+    "iterator",
+    "utilities"
+  ],
   "author": "Ілля Бугай",
   "license": "MIT"
 }
