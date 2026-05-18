@@ -1,5 +1,5 @@
 // while(true) is safe — yield pauses execution until the .next() call
-function* recipeGenerator(recipesArray) {
+export function* recipeGenerator(recipesArray) {
     let index = 0;
 
     while (true) {
@@ -9,7 +9,7 @@ function* recipeGenerator(recipesArray) {
 }
 
 // consumes the iterator every 900ms for durationInSeconds, then returns the last value
-function spinTheCarousel(iterator, durationInSeconds) {
+export function spinTheCarousel(iterator, durationInSeconds) {
     return new Promise(resolve => {
 
         let currentValue;

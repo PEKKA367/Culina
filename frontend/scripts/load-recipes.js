@@ -1,19 +1,21 @@
 //IMPORTS
 import { db } from './firebase-config.js';
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { recipeGenerator, spinTheCarousel } from "../../core-utils/iterator.js";
 
 
 //CONSTANTS & DOM ELEMENTS
 const recipesContainer = document.getElementById('recipes');
 const recipeTemplate = document.getElementById('recipe-template');
+const btnSurprise = document.getElementById('btn-surprise');
 
 const DOM = {
-    card: '.card',          // Головний контейнер картки
-    title: '.recipe-title',        // Заголовок
-    desc: '.recipe-description',   // Опис
-    count: '.ingredients-count',   // Лічильник інгредієнтів
-    btnDelete: '.btn-delete',      // Кнопка видалення
-    link: '.btn-open'              // Кнопка відкриття
+    card: '.card',
+    title: '.recipe-title',
+    desc: '.recipe-description',
+    count: '.ingredients-count',
+    btnDelete: '.btn-delete',
+    link: '.btn-open'
 };
 
 
@@ -81,6 +83,18 @@ function createRecipeCard(firebaseDoc) {
 
 
 //MAIN FUNCTIONS
+async function handleSurpriseMe() {
+    btnSurprise.disabled = true;
+    btnSurprise.textContent = 'Пошук...';
+
+    const snapshot = await getDocs(collection(db, "recipes"));
+    const recipes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // adds id (not stored inside Firebase doc by default) to each recipe object
+    recipes.sort(() => Math.random() - 0.5); // ДОДАНО: перемішуємо для рандому
+    const gen = recipeGenerator(recipes);
+    const recipe = await spinTheCarousel(gen, 3);
+    window.location.href = `pages/recipe.html?id=${recipe.id}`;
+}
+
 async function loadRecipes() {
     try {
         // Очищаємо контейнер
@@ -114,3 +128,5 @@ async function loadRecipes() {
 
 // 5. PROGRAM EXECUTION
 loadRecipes();
+
+btnSurprise.addEventListener('click', handleSurpriseMe);
