@@ -25,13 +25,20 @@
             <ul>
                 <li>Лаба 3 — memoize (FIFO / LRU / LFU / TTL / custom)</li>
                 <li>Лаба 4 — BiPriorityQueue (oldest / newest / highest / lowest)</li>
+                <li>Лаба 5 — asyncFilter / asyncFilterCb з AbortController</li>
             </ul>
+
+            <div class="demo-block">
+                <button id="btn-cancel-filter" class="btn btn-primary">Run slow filter</button>
+                <p id="out-cancel-filter"></p>
+            </div>
         </div>
     </main>
 </div>
 
 <script type="module" src="../scripts/demos/memoize-demo.js"></script>
 <script type="module" src="../scripts/demos/pqueue-demo.js"></script>
+<script type="module" src="../scripts/demos/async-filter-demo.js"></script>
 </body>
 
 </html>
