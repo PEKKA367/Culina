@@ -1,7 +1,4 @@
 //IMPORTS
-import { db } from './firebase-config.js';
-import { collection, addDoc } from "firebase/firestore";
-
 
 //CONSTANTS
 const recipeForm = document.getElementById('form-recipe');
@@ -81,7 +78,12 @@ async function handleFormSubmit(event) {
         ingredients: ingredients
     };
     try {
-        await addDoc(collection(db, "recipes"), newRecipe);
+        console.log(JSON.stringify(newRecipe));
+        await fetch("http://localhost:3000/recipes", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newRecipe)
+        });
         alert("Рецепт успішно збережено!");
         window.location.href = "../index.html";
     } catch (error) {

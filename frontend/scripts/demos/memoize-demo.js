@@ -1,7 +1,7 @@
 // Demo for the memoize() utility from culina-utils.
 // Open DevTools console after loading pages/demos.html to see the output.
 
-import { memoize } from "culina-utils";
+import { memoize } from "../../../core-utils/memoize.js";
 
 
 // A "slow" function we want to memoize. The counter shows how often

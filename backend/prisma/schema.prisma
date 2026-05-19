@@ -12,7 +12,6 @@ datasource db {
   url = env("DATABASE_URL")
 }
 
-// ТАБЛИЦЯ 1: Користувачі
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -21,13 +20,13 @@ model User {
   recipes   Recipe[]
 }
 
-// ТАБЛИЦЯ 2: Рецепти
 model Recipe {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  ingredients Json
+  steps       Json
 
-  // Це зв'язок між таблицями!
-  authorId  Int
-  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int?
+  author    User?     @relation(fields: [authorId], references: [id])
 }

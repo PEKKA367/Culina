@@ -14,9 +14,10 @@ export function memoize(fn, options = {}) {
     const hits = new Map();   // used only for LFU
     const expiry = new Map(); // used only for TTL
 
+    // finds the key with the lowest hit count for LFU eviction
     function findLeastFrequentKey() {
         let minKey;
-        let minHits = Infinity;
+        let minHits = Infinity; // start high so any real count is smaller
         for (const [key, count] of hits) {
             if (count < minHits) {
                 minHits = count;
@@ -33,12 +34,13 @@ export function memoize(fn, options = {}) {
     }
 
     return function memoized(...args) {
-        const key = JSON.stringify(args);
+        const key = JSON.stringify(args); // array of args → string key for the Map
 
-        if (cache.has(key) && ! isExpired(key)) {
+        if (cache.has(key) && !isExpired(key)) {
             const value = cache.get(key);
 
             if (strategy === 'LRU') {
+                // re-insert to move key to end (Map preserves insertion order)
                 cache.delete(key);
                 cache.set(key, value);
             }
@@ -50,7 +52,7 @@ export function memoize(fn, options = {}) {
             return value;
         }
 
-        // either MISS or stale TTL — drop the stale one before recomputing
+        // cache MISS or stale TTL — drop the stale entry before recomputing
         if (cache.has(key)) {
             cache.delete(key);
             expiry.delete(key);
@@ -63,9 +65,9 @@ export function memoize(fn, options = {}) {
             if (strategy === 'LFU') {
                 keyToEvict = findLeastFrequentKey();
             } else if (strategy === 'custom' && customEvict) {
-                keyToEvict = customEvict(cache);
+                keyToEvict = customEvict(cache); // user decides which key to remove
             } else {
-                keyToEvict = cache.keys().next().value;
+                keyToEvict = cache.keys().next().value; // first key = oldest (FIFO/LRU)
             }
             cache.delete(keyToEvict);
             hits.delete(keyToEvict);
@@ -74,10 +76,10 @@ export function memoize(fn, options = {}) {
 
         cache.set(key, value);
         if (strategy === 'LFU') {
-            hits.set(key, 1);
+            hits.set(key, 1); // new entry starts with 1 hit
         }
         if (strategy === 'TTL' && ttlMs) {
-            expiry.set(key, Date.now() + ttlMs);
+            expiry.set(key, Date.now() + ttlMs); // record when this entry expires
         }
 
         return value;

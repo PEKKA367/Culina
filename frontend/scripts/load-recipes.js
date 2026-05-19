@@ -1,6 +1,4 @@
 //IMPORTS
-import { db } from './firebase-config.js';
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { recipeGenerator, spinTheCarousel } from "culina-utils";
 
 
@@ -22,17 +20,16 @@ const DOM = {
 //HELPER FUNCTIONS
 async function deleteRecipe(id, deleteButtonElement) {
     try {
-        await deleteDoc(doc(db, "recipes", id));
+        await fetch(`http://localhost:3000/recipes/${id}`,{
+            method: 'DELETE'
+        });
 
-        // Шукаємо батьківську картку, використовуючи наш словник
         const card = deleteButtonElement.closest(DOM.card);
         
-        // Гарна анімація зникнення перед видаленням (Опціонально)
         if (card) {
             card.style.opacity = '0';
             card.style.transform = 'scale(0.9)';
             
-            // Чекаємо 300мс (поки пройде анімація CSS), потім видаляємо
             setTimeout(() => card.remove(), 300);
         }
         
@@ -42,10 +39,7 @@ async function deleteRecipe(id, deleteButtonElement) {
     }
 }
 
-function createRecipeCard(firebaseDoc) {
-    const data = firebaseDoc.data();
-    const recipeId = firebaseDoc.id;
-
+function createRecipeCard(recipe) {
     const clone = recipeTemplate.content.cloneNode(true);
 
     const ui = {
@@ -56,25 +50,21 @@ function createRecipeCard(firebaseDoc) {
         link: clone.querySelector(DOM.link)
     };
 
-    // Заповнюємо даними
-    ui.title.textContent = data.title;
-    ui.desc.textContent = data.description;
-    
-    // Optional Chaining (?.) - безпечно беремо довжину
-    const count = data.ingredients?.length || 0;
+    ui.title.textContent = recipe.title;
+    ui.desc.textContent = recipe.description;
+
+    //? determines if object is null or undefined. If yes, then set it to 0 instead of throwing error
+    const count = recipe.ingredients?.length || 0;
     ui.count.textContent = `Інгредієнтів: ${count}`;
 
-    // Формуємо посилання
-    ui.link.href = `pages/recipe.html?id=${recipeId}`;
+    ui.link.href = `pages/recipe.html?id=${recipe.id}`;
 
-    // Вішаємо подію видалення
     ui.btnDelete.addEventListener("click", async () => {
-        if (confirm(`Видалити рецепт "${data.title}"?`)) {
-            // Кнопка переходить у стан "Завантаження" (UX покращення)
+        if (confirm(`Видалити рецепт "${recipe.title}"?`)) {
             ui.btnDelete.textContent = "Видалення...";
             ui.btnDelete.disabled = true;
             
-            await deleteRecipe(recipeId, ui.btnDelete);
+            await deleteRecipe(recipe.id, ui.btnDelete);
         }
     });
 
@@ -97,14 +87,12 @@ async function handleSurpriseMe() {
 
 async function loadRecipes() {
     try {
-        // Очищаємо контейнер
         recipesContainer.innerHTML = '';
 
-        const querySnapshot = await getDocs(collection(db, "recipes"));
+        const response = await fetch("http://localhost:3000/recipes");
+        const recipes = await response.json();
 
-        // Перевірка на порожню базу
-        if (querySnapshot.empty) {
-            // Використовуємо OOCSS класи для тексту
+        if (recipes.length === 0) {
             recipesContainer.innerHTML = `
                 <div style="grid-column: 1 / -1; text-align: center;">
                     <p class="card-desc">Рецептів поки немає. Додайте перший!</p>
@@ -113,9 +101,8 @@ async function loadRecipes() {
             return;
         }
 
-        // Рендеримо картки
-        querySnapshot.forEach((doc) => {
-            const cardElement = createRecipeCard(doc);
+        recipes.forEach(recipe => {
+            const cardElement = createRecipeCard(recipe);
             recipesContainer.appendChild(cardElement);
         });
 

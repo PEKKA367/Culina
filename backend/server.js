@@ -6,13 +6,63 @@ const bcrypt = require("bcryptjs");
 const prisma = new PrismaClient();
 
 fastify.register(cors, {
-    origin: "*"
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"]
 });
 
 fastify.register(require("@fastify/jwt"), {secret: process.env.JWT_SECRET})
 
 fastify.get("/", async (request, reply) => {
     return {message: "Мій бекенд для рецептів працює!"};
+});
+
+fastify.get("/recipes", async (request, reply) => {
+    const recipes = await prisma.recipe.findMany();
+    return recipes;
+});
+
+fastify.post("/recipes", async (request, reply) => {
+    try {
+        const { title, description, ingredients, steps } = request.body;
+
+        const recipe = await prisma.recipe.create({
+            data: {
+                title,
+                description,
+                ingredients,
+                steps,
+            }
+        });
+
+        return reply.code(201).send(recipe);
+    } catch (error) {
+        console.error("ПОМИЛКА:", error); // ← додали
+        return reply.code(500).send({ error: error.message });
+    }
+});
+
+fastify.get("/recipes/:id", async (request, reply) => {
+    const { id } = request.params;
+
+    const recipe = await prisma.recipe.findUnique({
+        where: { id: Number(id) }
+    });
+
+    if (!recipe) {
+        return reply.code(404).send({ error: "Рецепт не знайдено" });
+    }
+
+    return recipe;
+});
+
+fastify.delete("/recipes/:id", async (request, reply) => {
+    const { id } = request.params;
+
+    await prisma.recipe.delete({
+        where: { id: Number(id) }
+    });
+
+    return reply.code(204).send();
 });
 
 fastify.post("/users", async (request, reply) => {
