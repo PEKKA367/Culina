@@ -51,9 +51,31 @@ export class BiPriorityQueue {
 
     _pickNode(mode) {
         if (this._size === 0) return null;
-        if (mode === 'oldest') return this._head;
-        if (mode === 'newest') return this._tail;
+        if (mode === 'oldest')  return this._head;
+        if (mode === 'newest')  return this._tail;
+        if (mode === 'highest') return this._findExtremum(true);
+        if (mode === 'lowest')  return this._findExtremum(false);
         return null;
+    }
+
+    // Linear scan for the node with the highest (or lowest) priority.
+    // On equal priorities the node with the smaller seq wins — that is the
+    // one that was enqueued earlier. Using a monotonic counter (not Date.now)
+    // means two enqueue calls in the same millisecond are still ordered.
+    _findExtremum(wantHighest) {
+        let best = this._head;
+        let node = this._head.next;
+        while (node !== null) {
+            const better = wantHighest
+                ? node.priority > best.priority
+                : node.priority < best.priority;
+            const tie = node.priority === best.priority && node.seq < best.seq;
+            if (better || tie) {
+                best = node;
+            }
+            node = node.next;
+        }
+        return best;
     }
 
     // Detach a node from the linked list in O(1).
