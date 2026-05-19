@@ -2,10 +2,24 @@
 // Supported eviction strategies:
 //   FIFO (default) — removes the oldest inserted entry
 //   LRU            — removes the least recently used entry (reorders on get)
+//   LFU            — removes the least frequently used entry (by hit count)
 export function memoize(fn, options = {}) {
     const maxSize = options.maxSize || Infinity;
     const strategy = options.strategy || 'FIFO';
     const cache = new Map();
+    const hits = new Map(); // used only for LFU
+
+    function findLeastFrequentKey() {
+        let minKey;
+        let minHits = Infinity;
+        for (const [key, count] of hits) {
+            if (count < minHits) {
+                minHits = count;
+                minKey = key;
+            }
+        }
+        return minKey;
+    }
 
     return function memoized(...args) {
         const key = JSON.stringify(args);
@@ -13,10 +27,13 @@ export function memoize(fn, options = {}) {
         if (cache.has(key)) {
             const value = cache.get(key);
 
-            // LRU: move the key to the end so it becomes "most recently used"
             if (strategy === 'LRU') {
                 cache.delete(key);
                 cache.set(key, value);
+            }
+
+            if (strategy === 'LFU') {
+                hits.set(key, hits.get(key) + 1);
             }
 
             return value;
@@ -25,13 +42,22 @@ export function memoize(fn, options = {}) {
         const value = fn(...args);
 
         if (cache.size >= maxSize) {
-            // both FIFO and LRU remove the first key of the Map.
-            // for LRU it works because we reorder on every get above
-            const oldestKey = cache.keys().next().value;
-            cache.delete(oldestKey);
+            let keyToEvict;
+            if (strategy === 'LFU') {
+                keyToEvict = findLeastFrequentKey();
+            } else {
+                // FIFO and LRU both drop the first key in the Map
+                keyToEvict = cache.keys().next().value;
+            }
+            cache.delete(keyToEvict);
+            hits.delete(keyToEvict);
         }
 
         cache.set(key, value);
+        if (strategy === 'LFU') {
+            hits.set(key, 1);
+        }
+
         return value;
     };
 }
