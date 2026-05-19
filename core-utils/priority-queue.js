@@ -34,4 +34,43 @@ export class BiPriorityQueue {
 
         this._size++;
     }
+
+    // Look at the oldest / newest item without removing it. O(1).
+    peek(mode) {
+        const node = this._pickNode(mode);
+        return node === null ? undefined : node.item;
+    }
+
+    // Remove and return an item by mode ('oldest' | 'newest').
+    dequeue(mode) {
+        const node = this._pickNode(mode);
+        if (node === null) return undefined;
+        this._removeNode(node);
+        return node.item;
+    }
+
+    _pickNode(mode) {
+        if (this._size === 0) return null;
+        if (mode === 'oldest') return this._head;
+        if (mode === 'newest') return this._tail;
+        return null;
+    }
+
+    // Detach a node from the linked list in O(1).
+    // No splice / findIndex needed because we already hold the node reference.
+    _removeNode(node) {
+        if (node.prev === null) {
+            this._head = node.next;
+        } else {
+            node.prev.next = node.next;
+        }
+
+        if (node.next === null) {
+            this._tail = node.prev;
+        } else {
+            node.next.prev = node.prev;
+        }
+
+        this._size--;
+    }
 }
