@@ -4,10 +4,12 @@
 //   LRU            — removes the least recently used entry (reorders on get)
 //   LFU            — removes the least frequently used entry (by hit count)
 //   TTL            — drops entries older than options.ttlMs
+//   custom         — calls options.customEvict(cache) to pick a key to remove
 export function memoize(fn, options = {}) {
     const maxSize = options.maxSize || Infinity;
     const strategy = options.strategy || 'FIFO';
     const ttlMs = options.ttlMs;
+    const customEvict = options.customEvict;
     const cache = new Map();
     const hits = new Map();   // used only for LFU
     const expiry = new Map(); // used only for TTL
@@ -60,6 +62,8 @@ export function memoize(fn, options = {}) {
             let keyToEvict;
             if (strategy === 'LFU') {
                 keyToEvict = findLeastFrequentKey();
+            } else if (strategy === 'custom' && customEvict) {
+                keyToEvict = customEvict(cache);
             } else {
                 keyToEvict = cache.keys().next().value;
             }
