@@ -55,6 +55,18 @@ fastify.get("/recipes/:id", async (request, reply) => {
     return recipe;
 });
 
+fastify.put("/recipes/:id", async (request, reply) => {
+    const { id } = request.params;
+    const { title, description, ingredients, steps } = request.body;
+
+    const recipe = await prisma.recipe.update({
+        where: { id: Number(id) },
+        data: { title, description, ingredients, steps }
+    });
+
+    return recipe;
+});
+
 fastify.delete("/recipes/:id", async (request, reply) => {
     const { id } = request.params;
 

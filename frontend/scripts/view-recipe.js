@@ -1,13 +1,8 @@
 //IMPORTS
-import {db} from "./firebase-config.js";
-import {doc, getDoc} from "firebase/firestore";
-
 
 //CONSTANTS
 const urlParams = new URLSearchParams(window.location.search);
 const recipeId = urlParams.get("id");
-
-const docRef = doc(db, "recipes", recipeId);
 
 //DOM elements
 const titleElement = document.querySelector(".recipe-title");
@@ -53,14 +48,14 @@ function renderSteps(stepsArray) {
 //MAIN FUNCTIONS
 async function displayRecipeDetails() {
     try {
-        const docSnap = await getDoc(docRef);
+        const response = await fetch(`http://localhost:3000/recipes/${recipeId}`);
 
-        if (!docSnap.exists()) {
+        if (!response.ok) {
             alert("Рецепт не знайдено!");
             return;
         }
 
-        const data = docSnap.data();
+        const data = await response.json();
 
         titleElement.textContent = data.title;
         descElement.textContent = data.description;

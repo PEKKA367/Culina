@@ -78,7 +78,6 @@ async function handleFormSubmit(event) {
         ingredients: ingredients
     };
     try {
-        console.log(JSON.stringify(newRecipe));
         await fetch("http://localhost:3000/recipes", {
             method: "POST",
             headers: { "Content-Type": "application/json" },

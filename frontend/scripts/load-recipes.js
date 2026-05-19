@@ -77,8 +77,8 @@ async function handleSurpriseMe() {
     btnSurprise.disabled = true;
     btnSurprise.textContent = 'Пошук...';
 
-    const snapshot = await getDocs(collection(db, "recipes"));
-    const recipes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); // adds id (not stored inside Firebase doc by default) to each recipe object
+    const response = await fetch('http://localhost:3000/recipes');
+    const recipes = await response.json();
     recipes.sort(() => Math.random() - 0.5);
     const gen = recipeGenerator(recipes);
     const recipe = await spinTheCarousel(gen, 3);
