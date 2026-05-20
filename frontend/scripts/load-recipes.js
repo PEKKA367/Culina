@@ -47,7 +47,7 @@ function debounce(callback, delay) {
 
 // Fetches matching recipes from the db. Error (not 2XX) = empty array to prevent UI crashes
 async function fetchSearch(searchText) {
-    const response = await fetch(`/recipes/search?searchText=${searchText}`);
+    const response = await fetch(`http://localhost:3000/recipes/search?searchText=${searchText}`);
 
     if (!response.ok) {
         console.error("Помилка пошуку");
@@ -184,6 +184,7 @@ loadRecipes();
 btnSurprise.addEventListener('click', handleSurpriseMe);
 
 btnSearch.addEventListener('click', handleSearchToggle);
+searchInput.addEventListener('input', handleLiveSearch);
 
 document.addEventListener('click', (event) => {
     if (!searchBar.contains(event.target) && !btnSearch.contains(event.target)) {

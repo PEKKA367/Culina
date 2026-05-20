@@ -56,14 +56,20 @@ fastify.post("/recipes", async (request, reply) => {
 });
 
 fastify.get("/recipes/search", async (request, reply) => {
-    const { searchText } = request.query;
+    try {
+        const { searchText } = request.query;
 
-    if (!searchText) {
-        return [];
+        if (!searchText) {
+            return [];
+        }
+
+        const recipes = await cachedSearch(searchText);
+        return recipes;
+
+    } catch (error) {
+        console.error("Backend error:", error);
+        reply.status(500).send({ error: "server eror" });
     }
-
-    const recipes = await cachedSearch(searchText);
-    return recipes;
 });
 
 fastify.get("/recipes/:id", async (request, reply) => {
