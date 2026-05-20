@@ -1,3 +1,23 @@
+/* (Structure) */
+.search-bar {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, margin 0.3s ease;
+}
+
+/* (Skin) */
+.search-bar.open {
+    max-height: 80px;
+    margin-bottom: 30px;
+}
+
+/* (Structure) */
+.nav-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
 .recipes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

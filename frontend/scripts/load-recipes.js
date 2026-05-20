@@ -7,6 +7,10 @@ const recipesContainer = document.getElementById('recipes');
 const recipeTemplate = document.getElementById('recipe-template');
 const btnSurprise = document.getElementById('btn-surprise');
 
+const btnSearch = document.getElementById('btn-search');
+const searchBar = document.getElementById('search-bar');
+const searchInput = document.getElementById('search-input');
+
 const DOM = {
     card: '.card',
     title: '.recipe-title',
@@ -117,3 +121,16 @@ async function loadRecipes() {
 loadRecipes();
 
 btnSurprise.addEventListener('click', handleSurpriseMe);
+
+btnSearch.addEventListener('click', () => {
+    searchBar.classList.toggle('open');
+    if (searchBar.classList.contains('open')) {
+        searchInput.focus(); // одразу фокус на поле
+    }
+});
+
+document.addEventListener('click', (event) => {
+    if (!searchBar.contains(event.target) && !btnSearch.contains(event.target)) {
+        searchBar.classList.remove('open');
+    }
+});

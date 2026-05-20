@@ -27,7 +27,7 @@
 
             <nav class="nav">
                 <ul class="nav-list">
-                    <li><a href="#" class="nav-link">Пошук</a></li>
+                    <li><button id="btn-search" class="nav-link nav-btn">Пошук</button></li>
                     <li><a href="#" class="nav-link">Категорії</a></li>
                 </ul>
             </nav>
@@ -40,6 +40,14 @@
 
     <main class="main">
         <div class="container">
+            <div id="search-bar" class="search-bar">
+                <input
+                        id="search-input"
+                        class="form-input"
+                        type="text"
+                        placeholder="Пошук рецептів..."
+                >
+            </div>
             <div id="recipes" class="recipes-grid">
             </div>
         </div>
