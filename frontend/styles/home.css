@@ -11,11 +11,16 @@
     margin-bottom: 30px;
 }
 
-/* (Structure) */
-.nav-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
+.search-input {
+    width: 100%;
+    border-radius: 50px;
+    border: 2px solid var(--color-dark);
+    background-color: var(--color-white);
+    padding: 14px 24px;
+}
+
+.search-input:focus {
+    border-color: var(--color-primary);
 }
 
 .recipes-grid {

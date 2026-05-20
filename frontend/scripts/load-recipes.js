@@ -22,6 +22,46 @@ const DOM = {
 
 
 //HELPER FUNCTIONS
+function handleSearchToggle() {
+    searchBar.classList.toggle('open');
+    if (searchBar.classList.contains('open')) {
+        searchBar.removeAttribute('inert');
+        searchInput.focus();
+    } else {
+        searchBar.setAttribute('inert', '');
+    }
+}
+
+// Delays function execution until the user stops typing
+function debounce(callback, delay) {
+    let timeoutId;
+
+    return function (...args) {
+        clearTimeout(timeoutId);
+
+        timeoutId = setTimeout(() => {
+            callback.apply(this, args);
+        }, delay);
+    };
+}
+
+// Fetches matching recipes from the db. Error (not 2XX) = empty array to prevent UI crashes
+async function fetchSearch(searchText) {
+    const response = await fetch(`/recipes/search?searchText=${searchText}`);
+
+    if (!response.ok) {
+        console.error("Помилка пошуку");
+        return [];
+    }
+
+    return await response.json();
+}
+
+async function fetchRecipes() {
+    const response = await fetch('http://localhost:3000/recipes');
+    return response.json();
+}
+
 async function deleteRecipe(id, deleteButtonElement) {
     try {
         await fetch(`http://localhost:3000/recipes/${id}`,{
@@ -81,8 +121,7 @@ async function handleSurpriseMe() {
     btnSurprise.disabled = true;
     btnSurprise.textContent = 'Пошук...';
 
-    const response = await fetch('http://localhost:3000/recipes');
-    const recipes = await response.json();
+    const recipes = await fetchRecipes();
     recipes.sort(() => Math.random() - 0.5);
     const gen = recipeGenerator(recipes);
     const recipe = await spinTheCarousel(gen, 3);
@@ -93,8 +132,7 @@ async function loadRecipes() {
     try {
         recipesContainer.innerHTML = '';
 
-        const response = await fetch("http://localhost:3000/recipes");
-        const recipes = await response.json();
+        const recipes = await fetchRecipes();
 
         if (recipes.length === 0) {
             recipesContainer.innerHTML = `
@@ -122,12 +160,7 @@ loadRecipes();
 
 btnSurprise.addEventListener('click', handleSurpriseMe);
 
-btnSearch.addEventListener('click', () => {
-    searchBar.classList.toggle('open');
-    if (searchBar.classList.contains('open')) {
-        searchInput.focus(); // одразу фокус на поле
-    }
-});
+btnSearch.addEventListener('click', handleSearchToggle);
 
 document.addEventListener('click', (event) => {
     if (!searchBar.contains(event.target) && !btnSearch.contains(event.target)) {

@@ -2,8 +2,22 @@ const fastify = require("fastify")({logger: true});
 const cors = require("@fastify/cors");
 const {PrismaClient} = require("@prisma/client");
 const bcrypt = require("bcryptjs");
+const { memoize } = require("culina-utils");
 
 const prisma = new PrismaClient();
+
+const searchRecipesInDB = async (searchText) => {
+    return await prisma.recipe.findMany({
+        where: {
+            OR: [
+                { title: { contains: searchText, mode: "insensitive" } },
+                { description: { contains: searchText, mode: "insensitive" } }
+            ]
+        }
+    });
+};
+
+const cachedSearch = memoize(searchRecipesInDB, { strategy: 'TTL', ttlMs: 60000 });
 
 fastify.register(cors, {
     origin: "*",
@@ -39,6 +53,17 @@ fastify.post("/recipes", async (request, reply) => {
         console.error("ПОМИЛКА:", error); // ← додали
         return reply.code(500).send({ error: error.message });
     }
+});
+
+fastify.get("/recipes/search", async (request, reply) => {
+    const { searchText } = request.query;
+
+    if (!searchText) {
+        return [];
+    }
+
+    const recipes = await cachedSearch(searchText);
+    return recipes;
 });
 
 fastify.get("/recipes/:id", async (request, reply) => {
