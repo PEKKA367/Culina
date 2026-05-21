@@ -4,6 +4,7 @@ const {PrismaClient} = require("@prisma/client");
 const bcrypt = require("bcryptjs");
 const { memoize } = require("culina-utils");
 const { BiPriorityQueue } = require("culina-utils");
+const { asyncFilter } = require("culina-utils");
 
 const prisma = new PrismaClient();
 const dbQueue = new BiPriorityQueue();
@@ -126,6 +127,55 @@ fastify.delete('/recipes/:id', async (request, reply) => {
     dbQueue.enqueue({ type: 'DELETE_RECIPE', id: Number(id) }, 10);
 
     reply.status(202).send({ message: "The recipe deletion has been added to the queue" });
+});
+
+// Bulk deletion route with AbortController support
+// Allows the client to safely cancel the ongoing deletion process to save DB resources
+fastify.delete('/recipes/bulk', async (request, reply) => {
+    const { ids } = request.body;
+
+    // Initialize the abort controller for this specific HTTP request
+    // Has aborted: false by default and abort() that changes aborted: true and calls event "abort"
+    const controller = new AbortController();
+
+    // Listen for raw TCP socket closures (e.g., user closes tab or cancels request on frontend)
+    request.raw.on('close', () => {
+        if (request.raw.aborted || request.raw.destroyed) {
+            controller.abort(); // Broadcast the abort signal to our async operation
+        }
+    });
+
+    try {
+        const successfullyDeleted = await asyncFilter(
+            ids,
+            async (id) => {
+                // Artificial delay to simulate heavy I/O tasks (e.g., deleting images from a cloud bucket)
+                // This provides a time window to demonstrate the AbortController functionality for lab
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                await prisma.recipe.delete({ where: { id: Number(id) } });
+
+                return true;
+            },
+            { signal: controller.signal } // Give us the listening "contoller" to our array method
+        );
+
+        reply.status(200).send({
+            message: "Deleted successfully",
+            deletedIds: successfullyDeleted
+        });
+
+    } catch (error) {
+        // Failsafe: gracefully handle the intentional abort without crashing
+        if (error.name === "AbortError") {
+            console.log("[Backend] The bulk deletion was canceled by the user");
+            // 499 Client Closed Request: standard status code for client-aborted operations
+            return reply.status(499).send({ message: "Process cancelled" });
+        }
+
+        console.error("[Backend] Error:", error);
+        reply.status(500).send({ error: "Internal server error" });
+    }
 });
 
 fastify.post("/users", async (request, reply) => {

@@ -1,35 +1,39 @@
-// Async variants of Array.prototype.filter.
 //   asyncFilter   — Promise version, predicate returns Promise<boolean>
 //   asyncFilterCb — callback version, predicate calls cb(err, keep)
-// Both support AbortController via { signal } and clean up after themselves.
 
+// Creates a standard DOMException to mimic native fetch() abort behavior
 function makeAbortError() {
     // Same shape as fetch() produces when its signal is aborted.
     return new DOMException("Aborted", "AbortError");
 }
 
+// Processes items sequentially. Uses Promise.race for immediate cancellation
 export async function asyncFilter(arr, predicate, options = {}) {
     const signal = options.signal;
 
+    // Check if already aborted before starting
     if (signal && signal.aborted) {
         throw makeAbortError();
     }
 
+    // Promise that resolves only to reject when abort is triggered
     let abortReject;
-    const abortPromise = new Promise((_, reject) => { abortReject = reject; });
+    const abortPromise = new Promise((_, reject) => {
+        abortReject = reject;
+    });
 
     function onAbort() {
         abortReject(makeAbortError());
     }
+
     if (signal) {
-        signal.addEventListener("abort", onAbort, { once: true });
+        signal.addEventListener("abort", onAbort, {once: true});
     }
 
     try {
         const result = [];
         for (let i = 0; i < arr.length; i++) {
-            // race the predicate against abort so the await doesn't hang
-            // when the consumer cancels mid-flight
+            // Race the predicate against the abort signal to prevent hanging requests
             const keep = await Promise.race([
                 predicate(arr[i], i),
                 abortPromise
@@ -40,7 +44,7 @@ export async function asyncFilter(arr, predicate, options = {}) {
         }
         return result;
     } finally {
-        // cleanup happens on success, on error AND on abort
+        // Strict cleanup: ensure event listener is removed to prevent memory leaks
         if (signal) {
             signal.removeEventListener("abort", onAbort);
         }
@@ -48,7 +52,7 @@ export async function asyncFilter(arr, predicate, options = {}) {
 }
 
 
-// Error-first callback variant. The predicate must use node-style
+// Processes items in parallel. Strict adherence to Node.js callback standards
 // callback: predicate(item, i, (err, keep) => ...). Final result is
 // delivered the same way: callback(err, filteredArray).
 export function asyncFilterCb(arr, predicate, options, callback) {
@@ -73,9 +77,12 @@ export function asyncFilterCb(arr, predicate, options, callback) {
     let pending = arr.length;
     let done = false;
 
+    // Unified exit point to prevent multiple callback invocations
     function finish(err, result) {
         if (done) return;
         done = true;
+
+        // Strict cleanup on abort or finish
         if (signal) {
             signal.removeEventListener("abort", onAbort);
         }
@@ -85,8 +92,9 @@ export function asyncFilterCb(arr, predicate, options, callback) {
     function onAbort() {
         finish(makeAbortError());
     }
+
     if (signal) {
-        signal.addEventListener("abort", onAbort, { once: true });
+        signal.addEventListener("abort", onAbort, {once: true});
     }
 
     arr.forEach((item, i) => {
@@ -96,7 +104,7 @@ export function asyncFilterCb(arr, predicate, options, callback) {
                 finish(err);
                 return;
             }
-            keepMask[i] = ! ! keep;
+            keepMask[i] = !!keep;
             pending--;
             if (pending === 0) {
                 finish(null, arr.filter((_, idx) => keepMask[idx]));
