@@ -3,7 +3,7 @@ const cors = require("@fastify/cors");
 const {PrismaClient} = require("@prisma/client");
 const bcrypt = require("bcryptjs");
 const { memoize } = require("culina-utils");
-const { BiPriorityQueue } = require("core-utils");
+const { BiPriorityQueue } = require("culina-utils");
 
 const prisma = new PrismaClient();
 const dbQueue = new BiPriorityQueue();
@@ -120,14 +120,12 @@ fastify.put("/recipes/:id", async (request, reply) => {
     return recipe;
 });
 
-fastify.delete("/recipes/:id", async (request, reply) => {
+fastify.delete('/recipes/:id', async (request, reply) => {
     const { id } = request.params;
 
-    await prisma.recipe.delete({
-        where: { id: Number(id) }
-    });
+    dbQueue.enqueue({ type: 'DELETE_RECIPE', id: Number(id) }, 10);
 
-    return reply.code(204).send();
+    reply.status(202).send({ message: "The recipe deletion has been added to the queue" });
 });
 
 fastify.post("/users", async (request, reply) => {
