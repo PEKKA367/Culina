@@ -4,6 +4,7 @@ import {recipeGenerator, spinTheCarousel} from "culina-utils";
 
 //CONSTANTS
 let currentAbortController = null;
+let currentRequestId = null;
 
 //CONSTANTS (DOM ELEMENTS)
 const recipesContainer = document.getElementById('recipes');
@@ -206,9 +207,8 @@ function toggleBulkMode() {
     }
 }
 
-// Global controller reference to allow cancelling the ongoing fetch request
+// Sends a bulk delete request with a unique requestId to allow server-side cancellation
 async function handleBulkDelete() {
-    // Retrieve IDs from all checked recipe checkboxes
     const checkedBoxes = document.querySelectorAll(`${DOM.checkbox}:checked`);
     const selectedIds = Array.from(checkedBoxes).map(checkbox => Number(checkbox.value));
 
@@ -219,7 +219,10 @@ async function handleBulkDelete() {
 
     if (!confirm(`Delete ${selectedIds.length} recipes?`)) return;
 
+    // генеруємо унікальний id для цієї операції
     currentAbortController = new AbortController();
+    const requestId = `bulk-${Date.now()}`;
+    currentRequestId = requestId;
 
     btnBulkDelete.disabled = true;
     btnCancelBulk.style.display = 'inline-block';
@@ -227,49 +230,54 @@ async function handleBulkDelete() {
     console.log("Starting bulk deletion...");
 
     try {
-        // Pass the controller's signal to fetch, linking the request to our cancel button
         const response = await fetch('http://localhost:3000/recipes/bulk', {
             method: 'DELETE',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ids: selectedIds}),
+            body: JSON.stringify({ids: selectedIds, requestId}), // ДОДАНО requestId
             signal: currentAbortController.signal
         });
 
         if (response.status === 200) {
             const data = await response.json();
             console.log("Successfully deleted IDs:", data.deletedIds);
-
             await loadRecipes();
-        }
-        // Handle custom server response for client-aborted operations
-        else if (response.status === 499) {
+        } else if (response.status === 499) {
             console.log("Deletion was stopped by the user.");
             alert("Deletion process cancelled.");
             await loadRecipes();
         }
 
     } catch (error) {
-        // Safely catch the AbortError to prevent unhandled promise rejections in the console
         if (error.name === 'AbortError') {
             console.log('Request aborted by the browser');
+            await loadRecipes();
         } else {
             console.error('Network error:', error);
             alert("An error occurred during deletion.");
         }
     } finally {
-        currentAbortController = null; // Strict cleanup: reset controller reference regardless of outcome
+        currentAbortController = null;
         btnBulkDelete.disabled = false;
         btnCancelBulk.style.display = 'none';
         btnToggleBulk.style.display = 'inline-block';
-
         toggleBulkMode();
     }
 }
 
-function cancelBulkDeletion() {
+// Aborts the in-progress fetch and notifies the server to stop processing
+async function cancelBulkDeletion() {
     if (currentAbortController) {
         console.log("Triggering the abort signal");
         currentAbortController.abort();
+
+        if (currentRequestId) {
+            await fetch('http://localhost:3000/recipes/bulk/cancel', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({requestId: currentRequestId})
+            });
+            currentRequestId = null;
+        }
     }
 }
 

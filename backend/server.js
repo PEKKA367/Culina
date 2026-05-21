@@ -8,6 +8,7 @@ const {asyncFilter} = require("culina-utils");
 
 const prisma = new PrismaClient();
 const dbQueue = new BiPriorityQueue();
+const activeOperations = new Map();
 
 // Back worker: processes priority queue to prevent DB overload
 // Enable non-blocking API responses
@@ -121,38 +122,28 @@ fastify.put("/recipes/:id", async (request, reply) => {
     return recipe;
 });
 
-// Bulk deletion route with AbortController support
-// Allows the client to safely cancel the ongoing deletion process to save DB resources
+// Processes bulk deletion sequentially. Stores AbortController by requestId
+// to allow cancellation via POST /recipes/bulk/cancel
 fastify.delete('/recipes/bulk', async (request, reply) => {
-    const {ids} = request.body;
+    const {ids, requestId} = request.body;
 
-    // Initialize the abort controller for this specific HTTP request
-    // Has aborted: false by default and abort() that changes aborted: true and calls event "abort"
     const controller = new AbortController();
-
-    // Listen for raw TCP socket closures (e.g., user closes tab or cancels request on frontend)
-    request.raw.on("aborted", () => {
-        console.log("Client disconnected the call");
-        controller.abort(); // Broadcast the abort signal to our async operation
-    });
+    activeOperations.set(requestId, controller);
 
     try {
         const successfullyDeleted = await asyncFilter(
             ids,
             async (id) => {
-                // Artificial delay to simulate heavy I/O tasks
                 await new Promise(resolve => setTimeout(resolve, 3000));
 
                 if (controller.signal.aborted) {
-                    console.log(`[Backend] Врятовано рецепт ID: ${id} (видалення перервано)`);
                     throw new DOMException("Aborted", "AbortError");
                 }
 
-                await prisma.recipe.delete({ where: { id: Number(id) } });
-
+                await prisma.recipe.delete({where: {id: Number(id)}});
                 return true;
             },
-            {signal: controller.signal} // Give us the listening "contoller" to our array method
+            {signal: controller.signal}
         );
 
         reply.status(200).send({
@@ -161,16 +152,28 @@ fastify.delete('/recipes/bulk', async (request, reply) => {
         });
 
     } catch (error) {
-        // Failsafe: gracefully handle the intentional abort without crashing
         if (error.name === "AbortError") {
-            console.log("[Backend] The bulk deletion was canceled by the user");
-            // 499 Client Closed Request: standard status code for client-aborted operations
+            console.log("[Backend] Bulk deletion cancelled");
             return reply.status(499).send({message: "Process cancelled"});
         }
-
         console.error("[Backend] Error:", error);
         reply.status(500).send({error: "Internal server error"});
+    } finally {
+        activeOperations.delete(requestId);
     }
+});
+
+// Receives a requestId and aborts the matching bulk delete operation if still running
+fastify.post('/recipes/bulk/cancel', async (request, reply) => {
+    const {requestId} = request.body;
+    const controller = activeOperations.get(requestId);
+
+    if (controller) {
+        controller.abort();
+        console.log(`[Backend] Cancelled operation: ${requestId}`);
+    }
+
+    return reply.send({message: 'Cancelled'});
 });
 
 fastify.delete('/recipes/:id', async (request, reply) => {
