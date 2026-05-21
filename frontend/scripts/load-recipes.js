@@ -2,7 +2,10 @@
 import {recipeGenerator, spinTheCarousel} from "culina-utils";
 
 
-//CONSTANTS & DOM ELEMENTS
+//CONSTANTS
+let currentAbortController = null;
+
+//CONSTANTS (DOM ELEMENTS)
 const recipesContainer = document.getElementById('recipes');
 const recipeTemplate = document.getElementById('recipe-template');
 const btnSurprise = document.getElementById('btn-surprise');
@@ -11,13 +14,18 @@ const btnSearch = document.getElementById('btn-search');
 const searchBar = document.getElementById('search-bar');
 const searchInput = document.getElementById('search-input');
 
+const btnBulkDelete = document.getElementById('btn-bulk-delete');
+const btnCancelBulk = document.getElementById('btn-cancel-bulk');
+const btnToggleBulk = document.getElementById('btn-toggle-bulk-mode');
+
 const DOM = {
     card: '.card',
     title: '.recipe-title',
     desc: '.recipe-description',
     count: '.ingredients-count',
     btnDelete: '.btn-delete',
-    link: '.btn-open'
+    link: '.btn-open',
+    checkbox: '.recipe-checkbox'
 };
 
 
@@ -91,11 +99,16 @@ function createRecipeCard(recipe) {
         desc: clone.querySelector(DOM.desc),
         count: clone.querySelector(DOM.count),
         btnDelete: clone.querySelector(DOM.btnDelete),
-        link: clone.querySelector(DOM.link)
+        link: clone.querySelector(DOM.link),
+        checkbox: clone.querySelector(DOM.checkbox)
     };
 
     ui.title.textContent = recipe.title;
     ui.desc.textContent = recipe.description;
+
+    if (ui.checkbox) {
+        ui.checkbox.value = recipe.id;
+    }
 
     //? determines if object is null or undefined. If yes, then set it to 0 instead of throwing error
     const count = recipe.ingredients?.length || 0;
@@ -177,6 +190,89 @@ async function loadRecipes() {
     }
 }
 
+function toggleBulkMode() {
+    const checkboxWrappers = document.querySelectorAll('.card-checkbox-wrapper');
+    const isHidden = checkboxWrappers.length > 0 && checkboxWrappers[0].style.display === 'none';
+
+    if (isHidden) {
+        checkboxWrappers.forEach(w => w.style.display = 'block');
+        btnToggleBulk.textContent = 'Скасувати';
+        btnBulkDelete.style.display = 'inline-block';
+    } else {
+        checkboxWrappers.forEach(w => w.style.display = 'none');
+        btnToggleBulk.textContent = 'Вибрати';
+        btnBulkDelete.style.display = 'none';
+        document.querySelectorAll(DOM.checkbox).forEach(cb => cb.checked = false);
+    }
+}
+
+// Global controller reference to allow cancelling the ongoing fetch request
+async function handleBulkDelete() {
+    // Retrieve IDs from all checked recipe checkboxes
+    const checkedBoxes = document.querySelectorAll(`${DOM.checkbox}:checked`);
+    const selectedIds = Array.from(checkedBoxes).map(checkbox => Number(checkbox.value));
+
+    if (selectedIds.length === 0) {
+        alert("Please select at least one recipe to delete.");
+        return;
+    }
+
+    if (!confirm(`Delete ${selectedIds.length} recipes?`)) return;
+
+    currentAbortController = new AbortController();
+
+    btnBulkDelete.disabled = true;
+    btnCancelBulk.style.display = 'inline-block';
+    btnToggleBulk.style.display = 'none';
+    console.log("Starting bulk deletion...");
+
+    try {
+        // Pass the controller's signal to fetch, linking the request to our cancel button
+        const response = await fetch('http://localhost:3000/recipes/bulk', {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ids: selectedIds}),
+            signal: currentAbortController.signal
+        });
+
+        if (response.status === 200) {
+            const data = await response.json();
+            console.log("Successfully deleted IDs:", data.deletedIds);
+
+            await loadRecipes();
+        }
+        // Handle custom server response for client-aborted operations
+        else if (response.status === 499) {
+            console.log("Deletion was stopped by the user.");
+            alert("Deletion process cancelled.");
+            await loadRecipes();
+        }
+
+    } catch (error) {
+        // Safely catch the AbortError to prevent unhandled promise rejections in the console
+        if (error.name === 'AbortError') {
+            console.log('Request aborted by the browser');
+        } else {
+            console.error('Network error:', error);
+            alert("An error occurred during deletion.");
+        }
+    } finally {
+        currentAbortController = null; // Strict cleanup: reset controller reference regardless of outcome
+        btnBulkDelete.disabled = false;
+        btnCancelBulk.style.display = 'none';
+        btnToggleBulk.style.display = 'inline-block';
+
+        toggleBulkMode();
+    }
+}
+
+function cancelBulkDeletion() {
+    if (currentAbortController) {
+        console.log("Triggering the abort signal");
+        currentAbortController.abort();
+    }
+}
+
 
 // 5. PROGRAM EXECUTION
 loadRecipes();
@@ -185,6 +281,10 @@ btnSurprise.addEventListener('click', handleSurpriseMe);
 
 btnSearch.addEventListener('click', handleSearchToggle);
 searchInput.addEventListener('input', handleLiveSearch);
+
+btnBulkDelete.addEventListener('click', handleBulkDelete);
+btnCancelBulk.addEventListener('click', cancelBulkDeletion);
+btnToggleBulk.addEventListener('click', toggleBulkMode);
 
 document.addEventListener('click', (event) => {
     if (!searchBar.contains(event.target) && !btnSearch.contains(event.target)) {

@@ -2,9 +2,9 @@ const fastify = require("fastify")({logger: true});
 const cors = require("@fastify/cors");
 const {PrismaClient} = require("@prisma/client");
 const bcrypt = require("bcryptjs");
-const { memoize } = require("culina-utils");
-const { BiPriorityQueue } = require("culina-utils");
-const { asyncFilter } = require("culina-utils");
+const {memoize} = require("culina-utils");
+const {BiPriorityQueue} = require("culina-utils");
+const {asyncFilter} = require("culina-utils");
 
 const prisma = new PrismaClient();
 const dbQueue = new BiPriorityQueue();
@@ -19,7 +19,7 @@ setInterval(async () => {
         try {
             if (task.type === 'DELETE_RECIPE') {
                 await prisma.recipe.delete({
-                    where: { id: task.id }
+                    where: {id: task.id}
                 });
                 console.log(`[Worker] Recipe ${task.id} has deleted from db.`);
             }
@@ -33,14 +33,14 @@ const searchRecipesInDB = async (searchText) => {
     return await prisma.recipe.findMany({
         where: {
             OR: [
-                { title: { contains: searchText, mode: "insensitive" } },
-                { description: { contains: searchText, mode: "insensitive" } }
+                {title: {contains: searchText, mode: "insensitive"}},
+                {description: {contains: searchText, mode: "insensitive"}}
             ]
         }
     });
 };
 
-const cachedSearch = memoize(searchRecipesInDB, { strategy: 'TTL', ttlMs: 60000 });
+const cachedSearch = memoize(searchRecipesInDB, {strategy: 'TTL', ttlMs: 60000});
 
 fastify.register(cors, {
     origin: "*",
@@ -60,7 +60,7 @@ fastify.get("/recipes", async (request, reply) => {
 
 fastify.post("/recipes", async (request, reply) => {
     try {
-        const { title, description, ingredients, steps } = request.body;
+        const {title, description, ingredients, steps} = request.body;
 
         const recipe = await prisma.recipe.create({
             data: {
@@ -74,13 +74,13 @@ fastify.post("/recipes", async (request, reply) => {
         return reply.code(201).send(recipe);
     } catch (error) {
         console.error("ПОМИЛКА:", error); // ← додали
-        return reply.code(500).send({ error: error.message });
+        return reply.code(500).send({error: error.message});
     }
 });
 
 fastify.get("/recipes/search", async (request, reply) => {
     try {
-        const { searchText } = request.query;
+        const {searchText} = request.query;
 
         if (!searchText) {
             return [];
@@ -91,73 +91,68 @@ fastify.get("/recipes/search", async (request, reply) => {
 
     } catch (error) {
         console.error("Backend error:", error);
-        reply.status(500).send({ error: "server eror" });
+        reply.status(500).send({error: "server eror"});
     }
 });
 
 fastify.get("/recipes/:id", async (request, reply) => {
-    const { id } = request.params;
+    const {id} = request.params;
 
     const recipe = await prisma.recipe.findUnique({
-        where: { id: Number(id) }
+        where: {id: Number(id)}
     });
 
     if (!recipe) {
-        return reply.code(404).send({ error: "Рецепт не знайдено" });
+        return reply.code(404).send({error: "Рецепт не знайдено"});
     }
 
     return recipe;
 });
 
 fastify.put("/recipes/:id", async (request, reply) => {
-    const { id } = request.params;
-    const { title, description, ingredients, steps } = request.body;
+    const {id} = request.params;
+    const {title, description, ingredients, steps} = request.body;
 
     const recipe = await prisma.recipe.update({
-        where: { id: Number(id) },
-        data: { title, description, ingredients, steps }
+        where: {id: Number(id)},
+        data: {title, description, ingredients, steps}
     });
 
     return recipe;
 });
 
-fastify.delete('/recipes/:id', async (request, reply) => {
-    const { id } = request.params;
-
-    dbQueue.enqueue({ type: 'DELETE_RECIPE', id: Number(id) }, 10);
-
-    reply.status(202).send({ message: "The recipe deletion has been added to the queue" });
-});
-
 // Bulk deletion route with AbortController support
 // Allows the client to safely cancel the ongoing deletion process to save DB resources
 fastify.delete('/recipes/bulk', async (request, reply) => {
-    const { ids } = request.body;
+    const {ids} = request.body;
 
     // Initialize the abort controller for this specific HTTP request
     // Has aborted: false by default and abort() that changes aborted: true and calls event "abort"
     const controller = new AbortController();
 
     // Listen for raw TCP socket closures (e.g., user closes tab or cancels request on frontend)
-    request.raw.on('close', () => {
-        if (request.raw.aborted || request.raw.destroyed) {
-            controller.abort(); // Broadcast the abort signal to our async operation
-        }
+    request.raw.on("aborted", () => {
+        console.log("Client disconnected the call");
+        controller.abort(); // Broadcast the abort signal to our async operation
     });
 
     try {
         const successfullyDeleted = await asyncFilter(
             ids,
             async (id) => {
-                // Artificial delay to simulate heavy I/O tasks (e.g., deleting images from a cloud bucket)
-                // This provides a time window to demonstrate the AbortController functionality for lab
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                // Artificial delay to simulate heavy I/O tasks
+                await new Promise(resolve => setTimeout(resolve, 3000));
+
+                if (controller.signal.aborted) {
+                    console.log(`[Backend] Врятовано рецепт ID: ${id} (видалення перервано)`);
+                    throw new DOMException("Aborted", "AbortError");
+                }
 
                 await prisma.recipe.delete({ where: { id: Number(id) } });
 
                 return true;
             },
-            { signal: controller.signal } // Give us the listening "contoller" to our array method
+            {signal: controller.signal} // Give us the listening "contoller" to our array method
         );
 
         reply.status(200).send({
@@ -170,12 +165,24 @@ fastify.delete('/recipes/bulk', async (request, reply) => {
         if (error.name === "AbortError") {
             console.log("[Backend] The bulk deletion was canceled by the user");
             // 499 Client Closed Request: standard status code for client-aborted operations
-            return reply.status(499).send({ message: "Process cancelled" });
+            return reply.status(499).send({message: "Process cancelled"});
         }
 
         console.error("[Backend] Error:", error);
-        reply.status(500).send({ error: "Internal server error" });
+        reply.status(500).send({error: "Internal server error"});
     }
+});
+
+fastify.delete('/recipes/:id', async (request, reply) => {
+    const {id} = request.params;
+
+    if (isNaN(Number(id))) {
+        return reply.status(400).send({message: "Incorrect recipe ID"});
+    }
+
+    dbQueue.enqueue({type: 'DELETE_RECIPE', id: Number(id)}, 10);
+
+    reply.status(202).send({message: "The recipe deletion has been added to the queue"});
 });
 
 fastify.post("/users", async (request, reply) => {
