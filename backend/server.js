@@ -3,8 +3,30 @@ const cors = require("@fastify/cors");
 const {PrismaClient} = require("@prisma/client");
 const bcrypt = require("bcryptjs");
 const { memoize } = require("culina-utils");
+const { BiPriorityQueue } = require("core-utils");
 
 const prisma = new PrismaClient();
+const dbQueue = new BiPriorityQueue();
+
+// Back worker: processes priority queue to prevent DB overload
+// Enable non-blocking API responses
+setInterval(async () => {
+    if (dbQueue.size > 0) {
+        const task = dbQueue.dequeue("highest");
+        console.log(`[Worker] Assigned the task:`, task);
+
+        try {
+            if (task.type === 'DELETE_RECIPE') {
+                await prisma.recipe.delete({
+                    where: { id: task.id }
+                });
+                console.log(`[Worker] Recipe ${task.id} has deleted from db.`);
+            }
+        } catch (error) {
+            console.error(`[Worker] Task processing error ${task.id}:`, error);
+        }
+    }
+}, 2000);
 
 const searchRecipesInDB = async (searchText) => {
     return await prisma.recipe.findMany({
