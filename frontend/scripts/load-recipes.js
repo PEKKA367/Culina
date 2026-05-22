@@ -1,10 +1,32 @@
 //IMPORTS
-import {recipeGenerator, spinTheCarousel, Emitter, BaseClient, JwtProxy, RecipeService } from "culina-utils";
+import {
+    recipeGenerator,
+    spinTheCarousel,
+    Emitter,
+    BaseClient,
+    JwtProxy,
+    RecipeService,
+    Logger,
+    loggingDecorator
+} from "culina-utils";
 
 //CONSTANTS
 let currentAbortController = null;
 let currentRequestId = null;
 const emitter = new Emitter();
+
+const applicationLogger = new Logger({ output: "console", format: "text" });
+
+const safeHandleBulkDelete = loggingDecorator(handleBulkDelete, {
+    logger: applicationLogger,
+    level: "INFO"
+});
+
+// Level "ERROR" means it will stay completely silent unless an exception is thrown.
+const safeDeleteRecipe = loggingDecorator(deleteRecipe, {
+    logger: applicationLogger,
+    level: "ERROR"
+});
 
 // Assembling the API layer using Dependency Injection (DI)
 // This keeps our frontend completely decoupled from authentication logic and raw network requests.
@@ -118,7 +140,7 @@ function createRecipeCard(recipe) {
             ui.btnDelete.textContent = "Видалення...";
             ui.btnDelete.disabled = true;
 
-            await deleteRecipe(recipe.id, ui.btnDelete);
+            await safeDeleteRecipe(recipe.id, ui.btnDelete);
         }
     });
 
@@ -309,7 +331,7 @@ btnSurprise.addEventListener('click', handleSurpriseMe);
 btnSearch.addEventListener('click', handleSearchToggle);
 searchInput.addEventListener('input', handleLiveSearch);
 
-btnBulkDelete.addEventListener('click', handleBulkDelete);
+btnBulkDelete.addEventListener('click', safeHandleBulkDelete);
 btnCancelBulk.addEventListener('click', cancelBulkDeletion);
 btnToggleBulk.addEventListener('click', toggleBulkMode);
 
