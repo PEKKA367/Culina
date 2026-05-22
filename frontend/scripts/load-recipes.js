@@ -1,10 +1,10 @@
 //IMPORTS
-import {recipeGenerator, spinTheCarousel} from "culina-utils";
-
+import {recipeGenerator, spinTheCarousel, Emitter } from "culina-utils";
 
 //CONSTANTS
 let currentAbortController = null;
 let currentRequestId = null;
+const emitter = new Emitter();
 
 //CONSTANTS (DOM ELEMENTS)
 const recipesContainer = document.getElementById('recipes');
@@ -18,6 +18,8 @@ const searchInput = document.getElementById('search-input');
 const btnBulkDelete = document.getElementById('btn-bulk-delete');
 const btnCancelBulk = document.getElementById('btn-cancel-bulk');
 const btnToggleBulk = document.getElementById('btn-toggle-bulk-mode');
+
+const recipeCounterElement = document.getElementById("recipe-counter");
 
 const DOM = {
     card: '.card',
@@ -129,6 +131,24 @@ function createRecipeCard(recipe) {
     return clone;
 }
 
+// EVENT LISTENERS (Reactive Communication)
+
+// Updates UI counter
+emitter.on("recipesChanged", (totalCount) => {
+    if (recipeCounterElement) {
+        recipeCounterElement.textContent = `Всього рецептів: ${totalCount}`;
+    }
+});
+
+// Broken listener
+emitter.on("recipesChanged", () => {
+    throw new Error("This listener is broken intentionally to test the Emitter's error handling!");
+});
+
+// Logger, shows that execution continues
+emitter.on("recipesChanged", (totalCount) => {
+    console.log(`[Frontend] The UI was successfully updated. Total recipes: ${totalCount}`);
+});
 
 //MAIN FUNCTIONS
 async function handleSurpriseMe() {
@@ -177,6 +197,9 @@ async function loadRecipes() {
                     <p class="card-desc">Рецептів поки немає. Додайте перший!</p>
                 </div>
             `;
+
+            emitter.emit("recipesChanged", 0);
+
             return;
         }
 
@@ -184,6 +207,8 @@ async function loadRecipes() {
             const cardElement = createRecipeCard(recipe);
             recipesContainer.appendChild(cardElement);
         });
+
+        emitter.emit("recipesChanged", recipes.length);
 
     } catch (error) {
         console.error("Помилка завантаження:", error);
