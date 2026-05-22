@@ -1,6 +1,5 @@
 //IMPORTS
-import {recipeGenerator, spinTheCarousel, Emitter} from "culina-utils";
-
+import {recipeGenerator, spinTheCarousel, Emitter } from "culina-utils";
 
 //CONSTANTS
 let currentAbortController = null;
