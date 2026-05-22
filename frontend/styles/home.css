@@ -1,3 +1,13 @@
+.counter-container {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.recipe-counter {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
 /* (Structure) */
 .search-bar {
     max-height: 0;
@@ -48,7 +58,7 @@
 }
 
 .card-body {
-    padding: 15px;    
+    padding: 15px;
 }
 
 .card-title {
@@ -63,7 +73,7 @@
     color: var(--color-text-light);
     line-height: 1.5;
     margin-bottom: 20px;
-    
+
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
