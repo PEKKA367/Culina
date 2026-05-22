@@ -1,10 +1,16 @@
 //IMPORTS
-import {recipeGenerator, spinTheCarousel, Emitter } from "culina-utils";
+import {recipeGenerator, spinTheCarousel, Emitter, BaseClient, JwtProxy, RecipeService } from "culina-utils";
 
 //CONSTANTS
 let currentAbortController = null;
 let currentRequestId = null;
 const emitter = new Emitter();
+
+// Assembling the API layer using Dependency Injection (DI)
+// This keeps our frontend completely decoupled from authentication logic and raw network requests.
+const baseClient = new BaseClient();
+const authProxy = new JwtProxy(baseClient);
+const api = new RecipeService(authProxy);
 
 //CONSTANTS (DOM ELEMENTS)
 const recipesContainer = document.getElementById('recipes');
@@ -56,35 +62,23 @@ function debounce(callback, delay) {
     };
 }
 
-// Fetches matching recipes from the db. Error (not 2XX) = empty array to prevent UI crashes
 async function fetchSearch(searchText) {
-    const response = await fetch(`http://localhost:3000/recipes/search?searchText=${searchText}`);
-
-    if (!response.ok) {
-        console.error("Помилка пошуку");
-        return [];
-    }
-
-    return await response.json();
+    return await api.searchRecipes(searchText);
 }
 
 async function fetchRecipes() {
-    const response = await fetch('http://localhost:3000/recipes');
-    return response.json();
+    return await api.getAllRecipes();
 }
 
 async function deleteRecipe(id, deleteButtonElement) {
     try {
-        await fetch(`http://localhost:3000/recipes/${id}`, {
-            method: 'DELETE'
-        });
+        await api.deleteRecipeById(id);
 
         const card = deleteButtonElement.closest(DOM.card);
 
         if (card) {
-            card.style.opacity = '0';
-            card.style.transform = 'scale(0.9)';
-
+            card.style.opacity = "0";
+            card.style.transform = "scale(0.9)";
             setTimeout(() => card.remove(), 300);
         }
 
