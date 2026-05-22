@@ -7,7 +7,9 @@ import {
     JwtProxy,
     RecipeService,
     Logger,
-    loggingDecorator
+    loggingDecorator,
+    recipeStreamProducer,
+    processRecipeStream
 } from "culina-utils";
 
 //CONSTANTS
@@ -48,6 +50,8 @@ const btnCancelBulk = document.getElementById('btn-cancel-bulk');
 const btnToggleBulk = document.getElementById('btn-toggle-bulk-mode');
 
 const recipeCounterElement = document.getElementById("recipe-counter");
+
+const btnTestStream = document.getElementById("test-stream-btn"); // test
 
 const DOM = {
     card: '.card',
@@ -320,6 +324,33 @@ async function cancelBulkDeletion() {
             currentRequestId = null;
         }
     }
+}
+
+// Also test for lab 6
+if (btnTestStream) {
+    btnTestStream.addEventListener("click", async () => {
+        btnTestStream.disabled = true;
+        btnTestStream.textContent = "Processing Stream...";
+
+        try {
+            console.log("Test 1: Starting successful stream");
+
+            const goodStream = recipeStreamProducer(2, false);
+            await processRecipeStream(goodStream);
+
+            console.log("Test 1: Starting successful stream");
+
+            const badStream = recipeStreamProducer(3, true);
+            await processRecipeStream(badStream);
+
+        } catch (error) {
+            console.error("[UI Layer] Caught stream error:", error.message);
+            alert("Stream test completed. The error was successfully caught and re-thrown. Check the console.");
+        } finally {
+            btnTestStream.disabled = false;
+            btnTestStream.textContent = "Test lab6 stream";
+        }
+    });
 }
 
 

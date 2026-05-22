@@ -1,3 +1,31 @@
+.floating-stream-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 12px 24px;
+    background-color: #ff4757;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.floating-stream-btn:hover {
+    background-color: #ff6b81;
+    transform: translateY(-2px);
+}
+
+.floating-stream-btn:disabled {
+    background-color: #a4b0be;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .counter-container {
     text-align: center;
     margin-bottom: 30px;

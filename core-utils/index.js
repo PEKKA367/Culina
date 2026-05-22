@@ -8,3 +8,4 @@ export { JwtProxy, ApiKeyProxy, OAuthProxy } from "./AuthProxies.js";
 export { RecipeService } from "./ApiService.js";
 export { Logger } from "./Logger.js";
 export { loggingDecorator } from "./logging-decorator.js";
+export { recipeStreamProducer, processRecipeStream } from "./stream-processor.js";
