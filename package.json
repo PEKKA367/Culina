@@ -1,0 +1,16 @@
+{
+  "name": "culina-project",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Culinary recipe management system (Coursework)",
+  "workspaces": [
+    "frontend",
+    "backend",
+    "core-utils"
+  ],
+  "scripts": {
+    "start:backend": "npm run start --workspace=backend",
+    "start:frontend": "npm run start --workspace=frontend",
+    "install:all": "npm install"
+  }
+}
